@@ -29,7 +29,8 @@ public class MyServletListener implements ServletContextListener,
     public void contextInitialized(ServletContextEvent sce) {
         Map<String, ? extends ServletRegistration> servletRegistrationMap = sce.getServletContext().getServletRegistrations();
         for (String servletName : servletRegistrationMap.keySet()) {
-            System.out.println(servletName);
+            ServletRegistration sr = servletRegistrationMap.get(servletName);
+            System.out.println(servletName + " : " + sr.getClassName());
         }
     }
 
