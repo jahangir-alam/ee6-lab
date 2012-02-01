@@ -5,14 +5,12 @@ package net.therap.lab.ee6.listeners;
  * @since 1/31/12 1:52 PM
  */
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
+import net.therap.lab.ee6.filters.ProfilerFilter;
+
+import javax.servlet.*;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpSessionAttributeListener;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
-import javax.servlet.http.HttpSessionBindingEvent;
+import javax.servlet.http.*;
+import java.io.IOException;
 import java.util.Map;
 
 @WebListener()
@@ -27,11 +25,52 @@ public class MyServletListener implements ServletContextListener,
     // ServletContextListener implementation
     // -------------------------------------------------------
     public void contextInitialized(ServletContextEvent sce) {
-        Map<String, ? extends ServletRegistration> servletRegistrationMap = sce.getServletContext().getServletRegistrations();
+
+        ServletContext servletContext = sce.getServletContext();
+        Map<String, ? extends ServletRegistration> servletRegistrationMap = servletContext.getServletRegistrations();
+
+        System.out.println("Registered Servlets");
         for (String servletName : servletRegistrationMap.keySet()) {
             ServletRegistration sr = servletRegistrationMap.get(servletName);
             System.out.println(servletName + " : " + sr.getClassName());
         }
+
+        System.out.println("Registered Filters");
+        Map<String, ? extends FilterRegistration> filterRegistrations = servletContext.getFilterRegistrations();
+        for (String filterName : filterRegistrations.keySet()) {
+            FilterRegistration fr = filterRegistrations.get(filterName);
+            System.out.println(filterName + " : " + fr.getClassName());
+        }
+
+        ServletRegistration.Dynamic dynamicServlet = servletContext.addServlet("DynamicServlet", new HttpServlet() {
+            @Override
+            protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+                response.getWriter().println("Hello. This is from dynamic Servlet!");
+            }
+        });
+
+        dynamicServlet.addMapping("/dynamic");
+
+//        FilterRegistration.Dynamic dynamicFilter = servletContext.addFilter("DynamicFilter", new Filter() {
+//            @Override
+//            public void init(FilterConfig filterConfig) throws ServletException {
+//            }
+//
+//            @Override
+//            public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+//                    throws IOException, ServletException {
+//                System.out.println("Dynamic filter start");
+//                chain.doFilter(request, response);
+//                System.out.println("Dynamic filter end");
+//            }
+//
+//            @Override
+//            public void destroy() {
+//            }
+//        });
+//
+//        dynamicFilter.addMappingForServletNames(null, true, "DynamicServlet");
+
     }
 
     public void contextDestroyed(ServletContextEvent sce) {

@@ -1,5 +1,6 @@
 package net.therap.lab.ee6.servlets;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,20 +10,21 @@ import java.io.IOException;
 
 /**
  * @author jahangir
- * @since 1/31/12 1:32 PM
+ * @since 2/1/12 11:55 AM
  */
-@WebServlet(name = "HelloServlet", urlPatterns = {"/hello"})
-public class HelloServlet extends HttpServlet {
+@WebServlet(name = "SimpleAsyncServlet", urlPatterns = "/asyncServlet", asyncSupported = true)
+public class SimpleAsyncServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doGet(request, response);
+
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.getWriter().print("Hello!");
-        response.getWriter().flush();
+        AsyncContext asyncContext = request.startAsync(request, response);
+        asyncContext.setTimeout(1000);
+        asyncContext.dispatch("/home.jsp");
     }
 }
